@@ -1,0 +1,409 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[icelandic]{babel}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}  %Whoo Math.
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{listingsutf8}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\tcbuselibrary{listings}
+
+%listings settings
+\lstset{
+    numberstyle=\small\ttfamily,
+    numbersep=4pt,
+    numbers=left,
+    basicstyle=\small\ttfamily,,
+    showstringspaces=false,
+    escapebegin=\begin{text},
+    escapeend=\end{text},   
+    language=java,
+    captionpos=b,
+frame=single
+}
+
+\begin{document}
+%----------------------------------------------------------
+%title
+\title{\textbf{Lab assignment 2}}
+\author{hlysig}
+\date{}
+\maketitle
+\section{Introduction}
+This document contains the second lab class assignment for the course
+T-511-TGRA (Computer graphics). The source code for this document is hosted on
+Github (hlysig/tgra-2013). Students are encouraged to submit pull request for
+errors and improvements.
+
+\section{Coordinate systems}
+In the first lab class we discussed briefly how we defined the coordinate
+system for our applications. We placed similar code as in listing
+(\ref{setting_up_coordinates}) into our display, reshape or init function.
+This code should look similar to the one you write in Java LibGDX, C/C++ or any
+other programming language using OpenGL.
+
+\begin{lstlisting}[caption=Setting up the coordinat system from first lab class, label=setting_up_coordinates]
+// Load the Project matrix. Next commands will be 
+// applied on that matrix.
+glMatrixMode(GL_PROJECTION);
+
+// Fill the projection matrix with the identity matrix
+glLoadIdentity();
+
+// Set up a two-dimensional orthographic viewing region.
+gluOrtho2D(0, width, 0, height);
+
+// Set up affine transformation of x and y from world coordinates 
+// to window coordinates
+glViewport(0, 0, width, height);
+
+// Set the Modelview matrix back.
+glMatrixMode(GL_MODELVIEW_MATRIX); 
+\end{lstlisting}
+
+Though we haven't discussed what these functions do (glMatrixMode and
+glViewport), we stated that they would set up a coordinate system and a
+viewport mapping to the window coordinates. That is, the coordinate system for
+our application will be equal to the window that we are using.
+
+For some applications this is good but in some cases you might want to control how
+the coordinate system is represented and furthermore you might want to control
+how this coordinate system is mapped, or projected on the screen. This is most often
+referred to as \emph{Window to viewport transformation} (W2V) and you will hear a great deal
+about that term in this course.
+
+Without going heavily into the math of W2V (there will be a lecture on that
+topic later in the course), let us identify a simple problem where the need
+rises to use a different coordinate system and solve it with the tools that we
+have.
+
+\section{Math plotter}
+Let us write a simple OpenGL application that allows us to visualize a given
+mathematical function on a given interval. Let us plot the function
+(\ref{ex:sinx}) on the interval $[0, 10]$.
+
+\begin{equation}\label{ex:sinx}
+f(x) = sin(x)
+\end{equation}
+
+We can reuse our application from the first lab class (The box world) to plot
+this function. We begin by writing a function that returns a buffer of
+$\mathbb{R}^2$ points where each point is on the line generated from
+(\ref{ex:sinx}) and the distance between the points is some small number $\phi$
+that we select. This function can be implemented similar to listing
+(\ref{line_points}).
+
+\begin{lstlisting}[texcl, caption=Function for calculating porints on line on some interval for sin(x), label=line_points]
+private float[] createPlotPoints(float lower, 
+                                float higher, float step) {		
+  int buffer_size = (int)  (Math.ceil((higher-lower)/step)*2) + 2;
+  float[] buffer = new float[buffer_size];
+  int curr_index = 0;
+  for(float x = lower; x<higher; x+=step) {
+    buffer[curr_index] = x;
+	buffer[curr_index+1] = (float)Math.sin(x);
+	curr_index +=2;
+  }
+  return buffer;
+}
+\end{lstlisting}
+
+
+The first parameter, lower, is the left side fringe point of the curve and the
+higher parameter is the right side fringe point. The last parameter is our
+$\phi$ value, that is, the distance between points on the line that we are
+plotting. Larger value for $\phi$ gives a more solid line. 
+
+Now we can use this function to create vertex buffer for the sine curve
+that we can then plot. Listing (\ref{code:sinebuffer}) is an example of how
+we might do this in code.
+
+
+\begin{lstlisting}[texcl,label=code:sinebuffer, caption=Create vertex buffer for our sine function. ]
+float[] f = this.create_points(0f, 10f, 0.005f);
+this.number_of_points = f.length / 2;
+this.vertexBuffer = BufferUtils.newFloatBuffer(f.length);		
+this.vertexBuffer.put(f);
+this.vertexBuffer.rewind();
+Gdx.gl11.glVertexPointer(2, GL11.GL_FLOAT, 0, this.vertexBuffer);
+\end{lstlisting}
+
+
+Note that we have a member variable for the number of points in the buffer. We
+use this variable to know how many points we have to draw.
+
+Now we are ready to draw our the sine curve. We can write a code similar to the
+one in listing (\ref{code:drawcine}) into our display or render function.
+
+
+\begin{lstlisting}[texcl, label=code:drawcine, caption=Drawing the sine curve]
+private void display() {
+    Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+    Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
+    Gdx.gl11.glLoadIdentity();
+    Gdx.gl11.glColor4f(1f, 1f, 1f, 1f);
+    
+    Gdx.gl11.glPushMatrix();
+    Gdx.gl11.glDrawArrays(GL11.GL_POINTS, 0, this.number_of_points);
+    Gdx.gl11.glPopMatrix();	
+}
+\end{lstlisting}
+
+Now if you have written this application, or know the nature of the sine
+function, then you might have found out that there are two major problems with
+our solution. First, we are plotting on the interval $[0, 10]$ using screen
+coordinates. This means that we are drawing the sine function on the first 10
+pixels on the screen. The plot will be rather small - tiny would be a better
+word to describe it. Second, when $x$ is close to $3$ and $9$ the $y$ value are
+negative. That is, part of the curve will not be visible with current setup
+where part of it is outside of our window.
+
+This is no good and we need to fix this. To begin with we brute force this
+problem by applying a form of a affine transformation where we scale and
+translate the pixels that we intend to draw so we can see our sine curve on the
+screen.
+
+When we have managed to do that we alter our code to use the internal functions
+from OpenGL that solves this for us. Why go through all this hassle and why not
+just introduce the internal OpenGL functionality that solves this for us? The
+brute force method that we introduce here is similar to the one used by OpenGL.
+It is good to know how OpenGL solves things to be able to apply them
+effectively and efficiently in our applications.
+
+Now let us translate the $x$-values of our drawing to use the entire screen
+(not only the first 10 pixels). We have the range from 0 to 10. We can do it by
+scaling the x value with respect to the interval and the width of the screen,
+as we do in (\ref{eq:scaled_x}).
+
+\begin{equation}\label{eq:scaled_x}
+x_s = \frac{x \times \textnormal{screen width}}{10.0} 
+\end{equation}
+
+Let us convince ourself that this is what we need. When $x=0$ then
+(\ref{eq:scaled_x}) becomes 0 and when $x=10$ it becomes equal to the screen
+width. That is the interval $[0,10]$ will be scaled to $[0, \textnormal{screen width}]$.
+Awesome!
+
+Now let us scale and transform the $y$ values. Somewhere in our past we
+learned that the $y$ values for the sine function are always between $-1$ and
+$1$. Thus for the $y$ value we scale it to the center of the screen and
+translate it by $1$. This can be preformed as in (\ref{eq:scaled_y}).
+
+\begin{equation}\label{eq:scaled_y}
+y_s = \frac{(y +1.0) \times \textnormal{screen height}}
+           {\textnormal{2.0}}
+\end{equation}
+
+The formulae \ref{eq:scaled_x} and \ref{eq:scaled_y} can be written formally as follows.
+\begin{eqnarray}
+s_x &=& Ax + B\\
+s_y &=& Cy + D
+\end{eqnarray}
+
+No worries. You will hear more from these formulae later in the course. Let us
+just trust that they are right and correct. We are in no math mood today.
+
+We can then change our function from listing (\ref{line_points}) to favor our
+new discovery for scaling and translating the $x$ and $y$ values for each point
+for the sine function to fit on the screen as listing (\ref{refining-points-scale}).
+
+\begin{lstlisting}[caption=Creating vertex buffer for the sine function using scaling and transformation, label=refining-points-scale]
+private float[] create_points(float lower, float higher, float step){
+  float A,B,C,D;
+
+  A = this.screen_x / (higher-lower);
+  B = 0;
+  C = this.screen_y / 2.0f;
+  D = C;
+
+  int buffer_size = (int)  (Math.ceil((higher-lower)/step)*2) + 2;
+
+  float[] buffer = new float[buffer_size];
+  int curr_index = 0;
+  for(float x = lower; x<higher; x+=step){
+	buffer[curr_index] = A*x + B;
+	buffer[curr_index+1] = C * ((float) Math.sin(x)) + D;
+	curr_index +=2;
+  }
+  return buffer;
+}
+\end{lstlisting}
+
+After these changes you should see your plot on the screen. Amazed? I hope so.
+Next we look at the functionality that OpenGL provides for us so we don't have
+to deal with this awful scaling and translation ourself!
+
+\subsection{The World Window}
+When drawing an OpenGL scene we can enter vertices with any coordinates, in a
+continuous space of unlimited size. Our screen, however is of a fixed size and
+we need to control which part of our endless virtual world we project onto it.
+In 2D we define the World Window. The World Window simply has values for it's
+left, right, bottom and top edges and anything within those boundaries will be
+projected onto the screen. Anything outside will be cut away. To set up a World
+Window we use the function:
+\begin{lstlisting}
+gluOrtho2D(left, right, bottom, top)
+// For libGDX:
+Gdx.glu.gluOrtho2D(Gdx.gl10, left, right, bottom, top);
+\end{lstlisting}
+The values for the edges can be any floating point numbers and they need have
+no connection at all with the pixels or even the width/height ratio of the
+screen we‘ll be projecting it on. If we imagine our $1.0f$ unit represents a
+meter and we‘ll be drawing microscopic objects then we can put in numbers like
+$0.0001$ and if we are drawing solar systems we can use $1000000.0f$ and call each
+unit $1000$ kilometers. This is our world and we can set it up any way we want.
+For the case of the sine function in our ``sine world'' the world window might
+be from $0$ to $10$ and $-1$ to $1$.
+
+\section{The Viewport}
+The viewport is the area on the screen that we will be projecting our scene
+onto. The default Viewport is simply the whole drawable canvas of our program
+window but we can control this as well. The OpenGL function we use is:
+\begin{lstlisting}
+glViewport(x, y, width, height)
+//libGDX:
+Gdx.gl11.glViewport(x, y, width, height);
+\end{lstlisting}
+$(x,y)$ refers to the lower left corner of the area we want to project onto and
+width and height are simply the width and hight (in pixels) of that area. These
+variables are integer numbers and must describe a viewport that lies within the
+drawable canvas of our program window.When our scene is projected onto the
+screen the lower left corner of the World Window is fitted to the lower left of
+the Viewport and the upper right corners aligned as well.
+
+Within the same frame we can call both the glViewport and the Ortho2D functions
+as often as we wish and are able to work with different viewports and world
+windows any way we like. Common applications are split screen multiplayer games
+and little map views in one corner of a main game screen.
+
+\section{Access to the program window}
+LibGDX gives us a way to retrieve the current size of the drawable area of our
+program window through the functions:
+\begin{lstlisting}
+Gdx.graphics.getWidth();
+Gdx.graphics.getHeight();
+\end{lstlisting}
+This allows us to taylor our World Window and Viewport to that area and helps
+us properly work with different full screen resolutions, i.e. on different
+types of Android phones.
+
+\section{Last refinement of our sine program}
+Before we leave our sine application for ever, let us make one last improvement
+using the above mentioned Window and viewport. Revert the function that
+we implemented to create the vertex buffer for the sine function to it's
+original state (as in listing (\ref{line_points})). Note that we stated that this
+implementation had some issues that we discussed earlier. That was not entirerly
+correct. To solve that we applied some transformations ourself. Let us use
+window to viewport mapping to solve this for us as the following listing.
+\begin{lstlisting}
+public void resize(int width, int height) {
+  Gdx.gl11.glMatrixMode(GL11.GL_PROJECTION);
+  Gdx.gl11.glLoadIdentity();
+  Gdx.glu.gluOrtho2D(Gdx.gl11, 0, 10, -1, 1);
+  Gdx.gl11.glViewport(0, 0, width, height);
+  Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW_MATRIX);    
+}
+\end{lstlisting}
+Note that here we set our world window to $(0,10)$ and $(-1,1)$ than we set the viewport to the
+screen size. When you execute the sine application the sine function should be exactly the same -
+where OpenGL is applying similar functionality as we implemented beforehand. Awesome!
+
+
+%% added from kari
+\section{Different world windows}
+Now let's stop thinking about sine and start doing something more fun. Open up
+the project from last week or reuse the box home assignment and let us do some
+experiments with windows and viewports. Make a few class variables, just to
+keep things clear:
+\begin{lstlisting}
+float world_left;
+float world_right;
+float world_bottom;
+float world_top;
+\end{lstlisting}
+Then change the values in your gluOrtho2D call to:
+\begin{lstlisting}
+Gdx.glu.gluOrtho2D(Gdx.gl10, world_left, world_right, 
+               world_bottom, world_top);
+\end{lstlisting}
+If you are calling these function from reshape then move them to your display
+function. This way you won't forget what the values stand for either, as the
+parameters in glViewport are a bit different.  Now you can go to your update
+function and set values for these new variables. Start with:
+
+\begin{lstlisting}
+world_left = 0;
+world_right = Gdx.graphics.getWidth();
+world_bottom = 0;
+world_top = Gdx.graphics.getHeight();
+\end{lstlisting}
+Make sure your display function is drawing something all over the screen. One
+of the first hand-ins should suffice. Then start playing around with the
+values. Try displaying only a quarter of the original world. Then try
+displaying a portion of that size, but centered in the original world. Try a
+larger World Window and try negative values as well. Experiment.  
+
+
+\section{Set up different Viewports}
+Make class variables for the viewport too:
+\begin{lstlisting}
+float viewport_left;
+float viewport_bottom;
+float viewport_width;
+float viewport_height;
+\end{lstlisting}
+And somewhere in the display function, close to your Ortho2D method call add:
+\begin{lstlisting}
+Gdx.gl11.glViewport(viewport_left, viewport_right, 
+               viewport_width, viewport_height);
+\end{lstlisting}
+Also set values for the variables in udpate.
+\begin{lstlisting}
+viewport_left = 0;
+viewport_bottom = 0;
+viewport_width = Gdx.graphics.getWidth(); 
+viewport_height = Gdx.graphics.getHeight();
+\end{lstlisting}
+This affects where on the canvas your World Window will be projected. Try to
+halve the values for width and height. Then play around with the values for
+left and bottom.
+
+
+\section{Set up multiple Viewports and World Windows}
+Now, let's try to display our scene twice, in the same frame but display it
+through a different World Window and project it to a different Viewport.  Set
+up variables for a second of each (viewport2\_left, world2\_top, etc.).  Nice
+initial values for the viewports are:
+\begin{lstlisting}
+Viewport1_left = 0;
+Viewport1_bottom = 0;
+Viewport1_width = Gdx.graphics.getWidth() / 2; 
+Viewport1_height = Gdx.graphics.getHeight(); 
+Viewport2_left = Gdx.graphics.getWidth() / 2; 
+Viewport2_bottom = 0;
+Viewport2_width = Gdx.graphics.getWidth() / 2; 
+Viewport2_height = Gdx.graphics.getHeight(); 
+\end{lstlisting}
+So we've split the screen in two equal parts, side by side.
+Now take your display code (apart from the MatrixMode, Identity, Ortho2D and
+Viewport) and move it into a peparate method (maybe private void drawScene() or
+something).  In your display function do (in pseudo code here): 
+\begin{lstlisting}
+Set viewport1
+Set world1 
+Draw scene 
+Set viewport2 
+Set world2 
+Draw scene 
+\end{lstlisting}
+Play around with values for the world windows.  Can you set up the left window
+so that it's the same size as the viewport so you can draw there pixel for
+pixel, then set up a „zoom view“ in the right viewport?  Can you move the right
+„zoom view“ around by clicking with the mouse in the left „full view“?
+Experiment experiment
+experiment!
+\end{document}
