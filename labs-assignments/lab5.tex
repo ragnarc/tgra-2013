@@ -1,0 +1,79 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[utf8]{inputenc}
+\title{\textbf{Lab assignment 5}}
+\author{\textbf{T-511-TGRA}}
+\date{}
+
+\begin{document}
+\maketitle
+\section*{Introduction}
+This document contains a problem set for Lab class 5 in the course T-511-TGRA.
+This document is hosted on Github (https://github.com/hlysig/tgra-2013) for the course. Please be a lad and send us pull requests with fixes if you find any errors in this document.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Problem 1}
+\begin{itemize}
+    \item[i)] {
+    Make 2D transformation matrix $A$ for translating by $(3,5)$. 
+     Translate the point $p=(1,2)$ with $A$.
+   
+    }
+    \item[ii)] {
+    Make a 2D transformation matrix $B$ for double scaling.
+    Transform the point $p=(5,4)$ with $B$.
+    }
+    \item[iii)] {
+        Make a 2D transformation matrix $C$ for $36^\circ$ rotation.
+
+        Transform the point $p=(3,-1)$ with $C$.
+           }
+    \item[iv)]{
+    Make a 2D transformation matrix that applies a combined transformation. The
+    combined transformation is as so: translate a coordinate frame first as in
+    A, then as in B (relative to the previous coordinate frame) and finally as
+    in C (again relative to the previous coordinate frame)
+    }
+  \end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Problem 2}
+\begin{itemize}
+\item[a)] {
+How will the \emph{ModelView} matrix be if we execute the following lines.
+\begin{enumerate}
+        \item \texttt{glLoadIdentity();}
+        \item \texttt{gluLookat(5,7,3,4,7,1,0,1,0)}
+\end{enumerate}
+}
+
+\item[b)]{
+        Show the values in the modelview matrix if the following lines of code are executed after the code in a)
+        \begin{enumerate}
+            \item \texttt{glRotated(30,1,0,0);}
+            \item \texttt{glTranslate(0,10,0);}
+        \end{enumerate}
+}
+Please calculate the eye coordinate for the point $p=(1,1,1).$ using the ModelView matrix that you have constructed.
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Problem 3}
+We are given three points on a plane:
+\begin{equation*}
+    p_1 = (3,2,4), \quad p_2 = (4,3,0), \quad p_3 = (5,2,3)
+\end{equation*}
+We then have a ray, starting at point $A=(-1,-2,3)$ which has the direction $\vec{c}=(1,5,3)$. Let us find
+$p_{hit}$ and $t_{hit}$ where the line hits the plane.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\end{document}
+
+
