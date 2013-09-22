@@ -1,0 +1,81 @@
+\section*{Problem 3}
+An equation of plane can be given on a \emph{Point-normal form (PNF)}. To fulfill this form
+we need a normal of the plane, $\hat{n}$ and a point, $B$ that lies on the plane.
+Then we can find any point $R$ on the plane by solving the equation
+\begin{equation}
+    \left( R - B \right) \cdot \hat{n} = 0
+    \label{eq:pnf}
+\end{equation}
+where the vector $R-B$ must be orthogonal with the normal $\hat{n}$ using the orthogonal property of the
+dot product.\\
+
+There are many ways to give a formula for a line (or a ray). One is the \emph{Parametric form}.
+Given one point $p$ on the line (or an initial point of a ray) and the directional vector $\vec{c}$ of the line.
+We can find any point $p'$ on the line by scaling the vector $\vec{c}$ with some parameter $t$ and translate
+the point $p$ with that vector.
+\begin{equation}
+    p' = p + t\vec{c}
+    \label{eq:parametric}
+\end{equation}
+
+In the following problem we wish to find where a given line hits a plane, that is the point of hit.
+We will call that point $p_{hit}$. We are also interested in the time of hit, that we call $t_{hit}$.
+
+With our hypothetical line (that is hitting the plane) and from (\ref{eq:parametric}) we know that
+\begin{equation}
+    p_{hit} = A + ct_{hit}
+    \label{ref:phit}
+\end{equation}
+and from (\ref{eq:pnf}) we know that
+\begin{equation}
+    \left( p_{hit} - B \right) \cdot \hat{n} = 0
+    \label{ref:step2}
+\end{equation}
+where the point $p_{hit}$ lies on the plane (where the line hits the plane) and the vector $\left( p_{hit}-R \right)$ is therefore orthogonal to the normal of the plane.
+
+By combining (\ref{ref:phit}) and (\ref{ref:step2}) we get
+\begin{equation}
+    \left( A+ct_{hit} -B \right) \cdot \hat{n} = 0
+    \label{eq:step3}
+\end{equation}
+We can now rewrite (\ref{eq:step3}) as follows (the aim is to isolate $t_{hit}$):
+\begin{eqnarray*}
+    ((A-B) + ct_{hit}) \cdot \hat{n} &=& 0\\
+    (A-B) \cdot \hat{n} + ct_{hit} \cdot \hat{n} &=& 0\\
+    ct_{hit} \cdot \hat{n} &=& (B-A) \cdot \hat{n}\\
+    t_{hit}(c \cdot \hat{n}) &=& (B-A) \cdot{n}\\
+    t_{hit} &=& \frac{(B-A) \cdot \hat{n}}{c \cdot \hat{n}} 
+\end{eqnarray*}
+From this we can fill in (\ref{ref:phit}):
+\begin{equation}
+    p_{hit} = A +c\left(  \frac{(B-A) \cdot \hat{n}}{c \cdot \hat{n}} \right) 
+\end{equation}
+and we can use this formula to find where our line hits a plane.
+
+\subsection*{Solving the problem using $t_{hit}$ and $p_{hit}$}
+We are given three points on a plane:
+\begin{equation*}
+    p_1 = (3,2,4), \quad p_2 = (4,3,0), \quad p_3 = (5,2,3)
+\end{equation*}
+We then have a ray, starting at point $A=(-1,-2,3)$ which has the direction $\vec{c}=(1,5,3)$. Let us find
+$p_{hit}$ and $t_{hit}$ where the line hits the plane.
+
+First we need the normal vector of the plane
+\begin{eqnarray*}
+    \hat{n} &=& (p_2 - p_1) \times (p_3 - p_1)\\
+    \hat{n} &=& (1,1,-4) \times (2,0,-1)\\
+    \hat{n} &=& (-1,-7,-2)
+\end{eqnarray*}
+We can now use the $t_{hit}$ formula the we derived above. We select $B=p_1$.
+\begin{eqnarray*}
+    t_{hit} &=& \frac{(B-A) \cdot \hat{n}}{c \cdot \hat{n}}\\
+    t_{hit} &=& \frac{ (4,4,1)\cdot(-1,-7,-2) }{(1,5,3)\cdot(-1,-7,-2)}\\
+    t_{hit} &=& \frac{34}{42}
+\end{eqnarray*}
+We now know $t_{hit}$ and we can find the point where the ray hits the plane
+with $p_{hit}$.
+\begin{eqnarray*}
+    p_{hit} &=& A+ct_{hit}\\
+    p_{hit} &=& (-1, -2,3)+\left( \frac{34}{42}(1,5,3) \right)\\
+    p_{hit} &=& \left( -1+\frac{34}{42}, -2\frac{170}{42}, \frac{102}{42} \right)
+\end{eqnarray*}

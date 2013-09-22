@@ -1,0 +1,148 @@
+\section*{Problem 1}
+\begin{itemize}
+    \item[i)] {
+    Define a 2D transformation matrix $A$ for translating by $(3,5)$. 
+    \begin{equation*}
+        A = \begin{bmatrix}
+        1 & 0 & 3\\
+        0 & 1 & 5\\
+        0 & 0 & 1
+        \end{bmatrix} 
+        \label{eq:a-matrix}
+    \end{equation*}
+    Translate the point $p=(1,2)$ with $A$.
+    
+    \begin{eqnarray*}
+    p_A = \begin{bmatrix} 
+              1 & 0 & 3\\
+              0&1&5\\
+              0&0&1
+            \end{bmatrix}
+            \begin{bmatrix}
+                1\\2\\1
+            \end{bmatrix}
+            = \begin{bmatrix}
+                    1 + 3 \\
+                    2 + 5 \\
+                    1
+                    \end{bmatrix}
+            = \begin{bmatrix}
+            4\\7\\1
+            \end{bmatrix}
+    \end{eqnarray*}
+
+    }
+    \item[ii)] {
+    Make a 2D transformation matrix $B$ for double scaling.
+    \begin{equation*}
+        B = \begin{bmatrix}
+            2 & 0 & 0\\
+            0 & 2 & 0\\
+            0 & 0 & 1
+        \end{bmatrix}
+    \end{equation*}
+    Transform the point $p=(5,4)$ with $B$.
+    \begin{eqnarray*}
+        p_B = \begin{bmatrix}
+            2 & 0 & 0\\
+            0 & 2 & 0\\
+            0 & 0 & 1
+            \end{bmatrix}
+            \begin{bmatrix}
+            5\\4\\1
+            \end{bmatrix}
+            = \begin{bmatrix}
+                10\\8\\1
+            \end{bmatrix}
+    \end{eqnarray*}
+    }
+    \item[iii)] {
+        Make a 2D transformation matrix $C$ for $36^\circ$ rotation.
+        \begin{equation}
+            C = \begin{bmatrix}
+                cos36^{\circ} & -sin36^{\circ} & 0\\
+                sin36^{\circ} & cos36^{\circ} & 0\\
+                0 & 0 & 1
+                \end{bmatrix}
+              = \begin{bmatrix}
+                0.8 & -0.6 & 0\\
+                0.6 & 0.8 & 0\\
+                0 & 0 & 1
+                \end{bmatrix}
+        \end{equation}
+        Transform the point $p=(3,-1)$ with $C$.
+        \begin{eqnarray*}
+            p_C = \begin{bmatrix}
+                0.8 & -0.6 & 0\\
+                0.6 & 0.8 & 0\\
+                0 & 0 & 1
+                \end{bmatrix}
+                \begin{bmatrix}
+                3\\-1\\1
+                \end{bmatrix}
+                = \begin{bmatrix}
+                  2.4 + 0.6\\
+                  1.8 - 0.8\\
+                  1
+                  \end{bmatrix}
+                  = \begin{bmatrix}3\\1\\1\end{bmatrix}
+        \end{eqnarray*}
+    }
+    \item[iv)]{
+    Make a 2D transformation matrix that applies a combined transformation. The
+    combined transformation is as so: translate a coordinate frame first as in
+    A, then as in B (relative to the previous coordinate frame) and finally as
+    in C (again relative to the previous coordinate frame)
+    \begin{eqnarray*} 
+        ABC &=& 
+            \begin{bmatrix}
+            1 & 0 & 3\\
+            0 & 1 & 5\\
+            0 & 0 & 1
+            \end{bmatrix}
+            \begin{bmatrix}
+            2 & 0 & 0\\
+            0 & 2 & 0\\
+            0 & 0 & 1
+            \end{bmatrix}
+            \begin{bmatrix}
+            0.8 & -0.6 & 0\\
+            0.6 & 0.8 & 0\\
+            0 & 0 & 1
+            \end{bmatrix}\\
+        ABC&=&
+            \begin{bmatrix}
+            2 & 0 & 3\\
+            0 & 2 & 5\\
+            0 & 0 & 1
+            \end{bmatrix}
+            \begin{bmatrix}
+            0.8 & -0.6 & 0\\
+            0.6 & 0.8 & 0\\
+            0 & 0 & 1
+            \end{bmatrix}\\
+        ABC&=&
+            \begin{bmatrix}
+            1.6 & -1.2 & 3\\
+            1.2 & 1.6 & 5\\
+            0 & 0 & 1
+            \end{bmatrix}
+    \end{eqnarray*}
+    Transform point $p=(-2,3)$.
+    \begin{eqnarray*}
+        P_{ABC} &=& ABCp\\
+        P_{ABC} &=&
+        \begin{bmatrix}
+        1.6 & -1.2 & 3\\
+        1.2 & 1.6 & 5\\
+        0 & 0 & 1
+        \end{bmatrix}
+        \begin{bmatrix}
+        -2 \\ 3 \\ 1
+        \end{bmatrix} =
+        \begin{bmatrix}
+        -3.8\\7.4\\1
+        \end{bmatrix}
+    \end{eqnarray*}
+    }
+\end{itemize}

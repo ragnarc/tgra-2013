@@ -1,0 +1,167 @@
+\section*{Problem 2}
+Values are set in the modelview matrix transforming coordinates in relation to
+the direction and orientation of the camera as in (\ref{eq:glu_lookat_matrix}).
+\begin{equation}
+    \begin{bmatrix}
+        u_x & u_y & u_z & -eye \cdot u \\
+        v_x & v_y & v_z & -eye \cdot v \\
+        n_x & n_y & n_z & -eye \cdot n \\
+        0 & 0 & 0 & 1
+    \end{bmatrix}
+    \label{eq:glu_lookat_matrix}
+\end{equation}
+
+\begin{itemize}
+    
+    \item[a)]
+    {
+    How will the matrix look if the following code will be run:
+    \begin{enumerate}
+        \item \texttt{glLoadIdentity();}
+        \item \texttt{gluLookat(5,7,3,4,7,1,0,1,0)}
+        \end{enumerate}
+        \emph{After line 1}: the modelview matrix is
+        \begin{equation}
+            vm =
+            \begin{bmatrix}
+            1 & 0 & 0 & 0\\
+            0 & 1 & 0 & 0\\
+            0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 1\\
+            \end{bmatrix}
+        \end{equation}
+        After line 2: From the parameters in gluLookat we have the following
+        variables.
+        \begin{eqnarray}
+            eye = (5,7,3), \quad center=(4,7,1), \quad \vec{up}=(0,1,0)
+        \end{eqnarray}
+        \texttt{gluLookat} builds matrix that converts world coordinates to eye coordinates.
+        We then must create a coordinate frame for the camera coordinates from the variables
+        $eye$, $center$ and $\vec{up}$. The camera coordinate axes are defined as follows.
+        \begin{enumerate}
+            \item $\vec{n} = eye - center$
+            \item $\vec{u} = \vec{up} \times \vec{n}$
+            \item $\vec{v}= \vec{n} \times \vec{u}$
+        \end{enumerate}
+        Note that these vectors are not normalized. Before we can use them we must normalize them
+        as we do later in our solution. 
+        The vector $\vec{n}$ is our local z-axis so we will be looking along the negative $\vec{n}$.
+        The vector $\vec{u}$ should point straight to the right and since we’re looking
+        along negative $\vec{n}$ and the up vector points in a general up direction, $\vec{u}$
+        should be perpendicular to both of them.
+        Finally $\vec{v}$ should point straight up and be orthogonal to both $\vec{u}$ and $\vec{n}$.
+
+        Let us calculate the abovementioned vectors.
+        \begin{eqnarray}
+            \vec{n} &=& (5,7,3) - (4,7,1) = (1,0,2)\\
+            \vec{u} &=& (0,1,0) \times (1,0,2) = (2,0,-1)\\
+            \vec{v} &=& (1,0,2) \times (2,0,-1) = (0,5,0)
+        \end{eqnarray}
+        Next we normalize $\vec{n}$, $\vec{u}$ and $\vec{v}$.
+        \begin{eqnarray}
+            \hat{n} &=& \left( \frac{1}{\sqrt{5}}, 0,  \frac{2}{\sqrt{5}} \right)\\
+            \hat{u} &=& \left( \frac{2}{\sqrt{5}}, 0, \frac{-1}{\sqrt{5}} \right)\\
+            \hat{v} &=& \left( 0,1,0 \right)
+        \end{eqnarray}
+        Now we got u,v, n for the matrix in (\ref{eq:glu_lookat_matrix}). Now we only need to
+        find the values for $-eye \cdot \hat{u}$, $-eye \cdot \hat{v}$, $-eye \cdot \hat{n}$.
+        \begin{eqnarray}
+            -eye \cdot \hat{u} &=& (-5, -7, -3) \cdot \left( \frac{2}{\sqrt{5}}, 0, \frac{-1}{\sqrt{5}} \right)\\
+            &=& \frac{-10}{\sqrt{5}} + \frac{3}{\sqrt{5}} = \frac{-7}{\sqrt{5}}
+        \end{eqnarray}
+        \begin{eqnarray}
+            -eye \cdot \hat{v} &=& (-5, -7, -3) \cdot \left(0,1,0\right)\\
+            &=& -7
+        \end{eqnarray}
+        \begin{eqnarray}
+            -eye \cdot \hat{n} &=& (-5, -7, -3) \cdot \left( \frac{1}{\sqrt{5}}, 0, \frac{2}{\sqrt{5}} \right)\\
+            &=& \frac{-5}{\sqrt{5}} + \frac{-6}{\sqrt{5}} = \frac{-11}{\sqrt{5}}
+        \end{eqnarray}
+        After the second line has been executed, that is the \texttt{gluLookat} line, the modelview matrix becomes:
+        \begin{eqnarray}
+            vm = \begin{bmatrix}
+                \frac{2}{\sqrt{5}} & 0 & \frac{-1}{\sqrt{5}} & \frac{-7}{\sqrt{5}} \\
+                0 & 1 & 0 & -7 \\
+                \frac{1}{\sqrt{5}} & 0 & \frac{2}{\sqrt{5}} & \frac{-11}{\sqrt{5}} \\
+                0 & 0 & 0 & 1
+            \end{bmatrix}
+        \end{eqnarray}
+    }
+
+    \item[b)] {
+        Show the values in the modelview matrix if the following lines of code are executed after the code in a)
+        \begin{enumerate}
+            \item \texttt{glRotated(30,1,0,0);}
+            \item \texttt{glTranslate(0,10,0);}
+        \end{enumerate}
+        We define transformation matrices for 1) and 2). We name them $m_1$ and $m_2$ respectively.
+        \begin{equation}
+            m_1 = \begin{bmatrix}
+                   1 & 0 & 0 & 0\\
+                   0 & cos30^\circ & -sin30^\circ & 0\\
+                   0 & sin30^\circ & cos30^\circ & 0\\
+                   0 & 0 & 0 & 1
+                   \end{bmatrix}
+            \label{eq:trans1}
+        \end{equation}
+        
+        \begin{equation}
+            m_2 = \begin{bmatrix}
+                   1 & 0 & 0 & 0\\
+                   0 & 1 & 0 & 10\\
+                   0 & 0 & 1 & 0\\
+                   0 & 0 & 0 & 1
+                   \end{bmatrix}
+            \label{eq:trans2}
+        \end{equation}
+        Next we perform the calculation $(vm_1)m_2$
+        \begin{eqnarray}
+            vm_1 &=& \begin{bmatrix}
+                \frac{2}{\sqrt{5}} & 0 & \frac{-1}{\sqrt{5}} & \frac{-7}{\sqrt{5}} \\
+                0 & 1 & 0 & -7 \\
+                \frac{1}{\sqrt{5}} & 0 & \frac{2}{\sqrt{5}} & \frac{-11}{\sqrt{5}} \\
+                0 & 0 & 0 & 1
+            \end{bmatrix}
+            \begin{bmatrix}
+                   1 & 0 & 0 & 0\\
+                   0 & cos30^\circ & -sin30^\circ & 0\\
+                   0 & sin30^\circ & cos30^\circ & 0\\
+                   0 & 0 & 0 & 1
+                   \end{bmatrix}\\
+                   &=& \begin{bmatrix}
+                       \frac{2}{\sqrt{5}} & \frac{-0.5}{\sqrt{5}} & \frac{-0.866}{\sqrt{5}} & \frac{-7}{\sqrt{5}}\\
+                       0 & 0.866 & -0.5 & -7\\
+                       \label{eq:after_one}
+                       \frac{1}{\sqrt{5}} & \frac{1}{\sqrt{5}} & \frac{1.722}{\sqrt{5}} & \frac{-11}{\sqrt{5}}\\
+                       0 & 0 & 0 & 1
+                       \end{bmatrix}
+        \end{eqnarray}
+        Therefore, our modelview matrix becomes the matrix in (\ref{eq:after_one}) after executing the first line
+        of the code.
+
+        Now we know the matrix $vm_1$. Let us calculate $(vm_1)m_2$ for the second line of the abovementioned code.
+        \begin{eqnarray}
+            (vm_1) m_2 &=& \begin{bmatrix}
+               \frac{2}{\sqrt{5}} & \frac{-0.5}{\sqrt{5}} & \frac{-0.866}{\sqrt{5}} & \frac{-7}{\sqrt{5}}\\
+               0 & 0.866 & -0.5 & -7\\
+               \frac{1}{\sqrt{5}} & \frac{1}{\sqrt{5}} & \frac{1.722}{\sqrt{5}} & \frac{-11}{\sqrt{5}}\\
+               0 & 0 & 0 & 1
+           \end{bmatrix}
+           \begin{bmatrix}
+                   1 & 0 & 0 & 0\\
+                   0 & 1 & 0 & 10\\
+                   0 & 0 & 1 & 0\\
+                   0 & 0 & 0 & 1
+                   \end{bmatrix}\\
+                   &=& \begin{bmatrix}
+                       \frac{2}{\sqrt{5}} & \frac{0.5}{\sqrt{5}} & -0.866 & \frac{-12}{\sqrt{5}}\\
+                       0 & 0.866 & -0.5 & 1.66\\
+                       \label{eq:after_two}
+                       \frac{1}{\sqrt{5}} & \frac{1}{\sqrt{5}} & \frac{1.722}{\sqrt{5}} & \frac{-1}{\sqrt{5}}\\
+                       0 & 0 & 0 & 1
+                        \end{bmatrix}
+        \end{eqnarray}
+        Therefore, our modelview matrix becomes the matrix in (\ref{eq:after_two}) after executing the second line
+        of the code.
+    }
+\end{itemize}
