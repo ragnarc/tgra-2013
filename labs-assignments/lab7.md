@@ -9,7 +9,7 @@ A single light is in the light model in an OpenGL program. It has the ambient va
 Let us assume that we have the following code
     
     Gdx.gl11.glMatrixMode(GL11.GL_PROJECTION);
-    Gdx.gl11.glLoadIdentity();	gluPerspective(100, 1.333333f, 1.0f, 30.0f)
+    Gdx.gl11.glLoadIdentity();	gluPerspective(90, 1.25, 10,110);
 How will the Projection matrix look like when these lines of code have been executed.
 ## Programming
 We will continue on implementing the camera and some shapes from last lab class (lab assignment 6).
