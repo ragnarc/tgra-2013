@@ -1,0 +1,88 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{url}
+\title{Computer graphics:\\third programming assignment - where everything is possible}
+\author{hlysig}
+\begin{document}
+  \maketitle
+\section*{Introduction}
+This document contains description of the third programming assignment in the course T-511-TGRA.
+The deadline for this assignment is 18th November, 2013, at noon. 
+
+This assignment may be done as an individual project or in groups of no more than two people. This will not affect grading in any way.
+Source code and project files should be returned as in previous assignments. Make sure everything needed to run the program and all resources are contained within the project.
+
+Please hand-in a report with your solution describing methods, algorithms and any other ideas regrading your code. The report should also include at the least a short description of your design and how to run/play instructions.
+
+If you feel there is anything special about the program that should be taken into account when the this assignment is graded it should be mentioned in this report. If you use code you find on the web, give credit to the author in your report (and code).
+
+
+\section*{Requirements}
+Programs must include textured objects and convincing lighting(work with the colors of lights and materials, position and motion of lights). Not everything needs to be textured. An interesting application of textures is a \emph{skybox}\footnote{\url{http://en.wikipedia.org/wiki/Skybox_(video_games)}}, a huge cube surrounding the whole 3D area, with textures on the inside, serving as everything that can be seen at a distance.
+
+In most cases motion of some objects as well as the camera is expected. This can vary between projects though.
+The scope of the project is hard to describe. Animations can be 10 seconds long but include masses of interesting objects or they can be several minutes of minimalism. No time limit or size/scope limit can therefor be set, only that a game must be complete and an animation must be interesting (tell a little story?) and include the types of motion described below.
+
+
+Students should decide how the following can be used in their program and implement some of.
+\begin{itemize}
+\item
+Meshes with lists of vertices, normals and polygons (and texture coordinates?).
+\item
+Basic forms (cube, sphere, etc.).
+\item
+Motion along calculated smooth curves (requirement in 3D animation).
+\item
+Models or surfaces calculated from functions (Bezier patches, textured spheres, blobs, etc.). These can then also be texture mapped.
+\item
+Levels of Detail (LOD). Let distance decide with how much detail an object is drawn each frame.
+\item
+Blending and transparency.
+\item
+Billboarding (sprites). Putting textured 2D polygons into a 3D environment to represent more complex objects.
+\item
+Height maps for landscapes.
+\item
+Billboarding, transparency and all material related to OpenGL is well documented in the book \emph{OpenGL Programming Guide} which is available at the library.
+\end{itemize}
+
+The Maze structure from assignment 2 can be used as a base but in most cases it's better to start somewhat fresh.
+Students can implement anything that falls under the description but the following sections are a few good suggestions.
+
+\section*{3D racing game (mainly desktop but possible on android)}
+Here we need some track which the player cannot go too far off. For instance you can implement gates which the player has to go through in a ceratin order. Cars (or Spaceships or whatever) would then drive the course from start to end, or a number of laps and whoever finishes first wins.
+
+This can be implemented as a two player game on one computer with a split screen. One player would have a set of keys to control and would see his car and the whole scene from his point of view on the top half of the screen but the other player on the bottom half. This requires going through the display routine twice (apart from Clearing the buffers), only changing the Viewport and the camera position/orientation between passes. Otherwise the whole scene is being drawn for both players. If the view is from inside the car then your car is probably not drawn but the opponents car must be drawn in each viewport.
+A racing game could also have computer controlled cars or a two (or more) player networked setup.
+
+\section*{Collision flyer (Android accelerometer game but fine on desktop too)}
+Like „paper plane“. See the back of you flyer and tilt the phone (or use arrows) to move up down and from side to side. As you fly past objects make sure you don‘t hit them.
+
+
+\section*{3D puzzles and games (mouse and touch possibilities)}
+3D tetris, 3D breakout, 3D puzzles. Here you would have to actually make the game play 3D, not just breakout with cubes instead of squares. Sky's the limit for what can be implemented here. In most cases it would be important to be able to move the camera in a sensible way to view the game from different angles.
+
+\section*{3D animation (no input required)}
+This is a 3D realtime program that runs without any input from the user. It should run exactly the same every time it runs and has to make sure the time management can draw any frame at any given time (in seconds, not number of frame) exactly as it should be, regardless of what has already happened or how fast the computer is drawing it (how many frames per second).
+
+This program has to include some cuts (changes of the camera's position) and smooth motion of the camera and some objects, at least once (preferable more) a motion by a Bezier Curve with at least 4 control points.
+
+This project gives the most space for graphics (rather than collision, physics, game play) so students should consider the forms they're using, the motion of the camera, the lighting and changes in lighting, and so on. Also changes in the perspective angle (zoom) can be interesting.
+
+Objects can be made using the Mash class or loading objects from 3D design studios. Code for this can be found on line. This is however not necessary and a whole lot can be done using basic forms like spheres and cubes, scaled and assembled in different ways. That's often more involved and fun too.
+
+
+\section*{First person shooter (mainly desktop)}
+Here you can start with your maze program and use that as the level. Also use the Camera class to keep track of your own position and set the Camera. This program needs a network connection to be made, and the player's status to be sent to the other participating computer(s). Each program then has to have a camera set at their own position but draw some model at the position sent from the other participant(s). There has to be a way to shoot, calculate collisions between shots and players (and walls) and let all participants know what the status is.
+
+The graphics here need to be more involved than in the second assignment but a lot of the effort here will be on collision detection, networking and game status.
+
+\section*{Visualization}
+Sound and audio visualization from audio. Here students can play with audio files and generate visual art on runtime.
+Well known algorithms are known for this kind of tasks, such as FFT algorithims (Fast-Fourier Transforms). This line of project might can
+be fun for students that have strong interest in digital signal processing.
+
+\section*{What ever you like to do!}
+If nothing on the list above fits your range of interest and you have something else that you would like to implement in this project -- then please run your ideas through hlysig or Kari and we'll try to help you fit it to the requirements of this project.
+
+\end{document}
