@@ -1,0 +1,125 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\title{Computer Graphics: Lab class 11 - Motion and animation exercises}
+\author{hlysig}
+\begin{document}
+\maketitle
+
+\section{Calculating position of object moved with a Bezier curve}
+In this first exercise we solve a simple Bezier curve question. The question is as follows.
+We are given the following points.
+
+\begin{eqnarray*}
+p_1 &=& (1,4,8)\\
+p_2 &=& (4,5,7)\\
+p_3 &=& (6,-1, 3)\\
+p_4 &=& (12,20,50)
+\end{eqnarray*}
+
+Let us assume that a given object is moved using a Bezier curve. The points, $p_1$, $p_2$, $p_3$ and
+$p_4$ are the control points for the curve where $p_1$ is the starting point the $p_4$ is the ending point. Let us assume that this animation has the initial time at $20$ and the animation ends at time $50$. Please provide answer and calculation for the following question. What is the position of the object at time $31$?
+
+\subsection{Solution}
+In this problem we have four control points and from the lecture on Bézier curves and animation we learned that using Bernstein polynomials of degree $n$ gives us control point factors for a Bézier curve with $n+1$ control points.
+\begin{equation}\label{eq:bernstein}
+    B^n = \left( \left( 1-t \right)+t \right)^n
+\end{equation}
+We define Bernstein polynomial as (\ref{eq:bernstein}). In this case we solve (\ref{eq:bernstein}) in degree $3$ where we have four control points.
+
+\begin{equation}\label{eq:thirdbernstein}
+    B^3 = (1-t)^3 p_1 + 3(1-t)^2 t p_2 + 3(1-t) t^2 p_3 + t^3 p_4
+\end{equation}
+That is for control points $p_1$, $p_2$, $p_3$ and $p_4$.
+
+From the problem description we know that the start time is $20$ and the end time is $50$ and
+we are asked to find the objects value at time $31$. Let us calculate the $t$ ratio
+that we then use with (\ref{eq:thirdbernstein}) to find the position at time $t_{31}$. 
+
+\begin{eqnarray*}
+    t &=& \frac{\textnormal{current time} - \textnormal{start time}}{\textnormal{end time} - \textnormal{start time}}\\
+    t_{31} &=& \frac{31 - 20}{50-20}\\
+    t_{31} &=& \frac{11}{30}
+\end{eqnarray*}
+
+With the $t_{31}$ ratio we can can calculate the position $p$ of the box using \ref{eq:thirdbernstein} and our points. Let us call that function $B^3(t)$.
+
+\begin{eqnarray*}
+    B^3\left(\frac{11}{30}\right) &=& \left(1-\frac{11}{30}\right)^3 p_1 + 3\left(1-\frac{11}{30}\right)^2 \frac{11}{30} p_2 + 3\left(1-\frac{11}{30}\right) \left(\frac{11}{30}\right)^2 p_3 + \left(\frac{11}{30}\right)^3 p_4\\
+    B^3\left(\frac{11}{30}\right) &=& \left(\frac{6859}{27000}\right) p_1 + 3\left(\frac{361}{900}\right) \frac{11}{30} p_2 + 3\left(\frac{19}{30}\right) \frac{121}{900} p_3 + \frac{1331}{27000} p_4\\
+    B^3 \left( \frac{11}{30} \right) &=& \frac{6859}{27000} p_1 + 3 \frac{3971}{27000} p_2 + 3 \frac{2299}{27000} p_3 + \frac{1331}{27000} p_4\\
+    B^3 \left( \frac{11}{30} \right) &=& \frac{6859}{27000} p_1 + \frac{11913}{27000} p_2 + \frac{6897}{27000} p_3 + \frac{1331}{27000} p_4\\
+    B^3 \left( \frac{11}{30} \right) &=& \frac{6859}{27000} (1,4,8) + \frac{11913}{27000} (4,5,7) + \frac{6897}{27000} (6,-1,3) + \frac{1331}{27000} (12,20,50)\\
+    B^3\left(\frac{11}{30}\right) &=& (0.25, 1.02, 2.03) + (1.76, 2.21, 3.09) + (1.53, -0.25, 0,767) + (0.60, 0.98, 2.46)\\
+    B^3\left(\frac{11}{30}\right) &=& (4.14, 3.96, 8.347)
+\end{eqnarray*}
+
+With this control points and with the given start time and end time our object
+at time 31 will be at the point $(4.14,3.96,8.347)$.
+
+\section{Motion as function of time}
+To do an animation in (real time) 3D we have to make sure it looks the same every
+time the program is run. This is obvious with pre-rendered animations but in a real-
+time environment we don't know if the same amount of frames will be rendered
+each time. Thus we need to keep track of the time that has elapsed since the
+program started and let each object update itself accordingly. The will update their
+position and orientation (and maybe color and size) not only relative to the last
+frame but calculate it exactly as it should be at this point in the program. The change
+therefor cannot be an offset but has to be a function of the whole time passed, to
+make sure the animation will display the same frame at a given time, regardless of
+how many or which frames have already been displayed.
+The update function can be as follows.
+\begin{lstlisting}[frame=single, language=Java, basicstyle=\footnotesize\ttfamily]
+float elapsedTime = 0;
+void update() {
+  //here's the time from the start of the program
+  elapsedTime += Gdx.graphics.getDeltaTime();
+  someObject.update(elapsedTime);
+}
+\end{lstlisting}
+elapsedTime is now the time since update was called for the first time. We can also
+still keep track of deltaTime between frames if some objects are moved by input.
+
+\subsection{Motion Exercise}
+Make a class that draws some object with a position. You can use the box class. This object's draw function
+must perform it's own glTranslate( to a position it holds in a class variable
+(glTranslate should not be done outside the class, in the core display routine).
+Add an update function that takes a variable float elapsedTime which is the time in
+seconds. Make this function update the position as some function of time.
+You can try
+\begin{lstlisting}[frame=single, language=Java, basicstyle=\footnotesize\ttfamily]
+Position.y = sin(elapsedTime * pi);
+\end{lstlisting}
+or,
+\begin{lstlisting}[frame=single, language=Java, basicstyle=\footnotesize\ttfamily]
+Position.x = elapsedTime * speedConstant;
+\end{lstlisting}
+Add to the class variables for the rotation around different axis and try to update
+those similarly (and add the relevant transformation functions to the display
+function).
+
+Add startMotionTime and endMotionTime to the class. Also add Points
+startPostition and endPosition. Make the object stay at startPosition until
+elapsedTime is more than startMotionTime, then move at an even speed to
+endPosition, stopping there at endMotionTime. Between start and end, find
+
+\begin{lstlisting}[frame=single, language=Java, basicstyle=\footnotesize\ttfamily]
+t = (elapsedTime - startMotionTime) 
+     / (endMotionTime - startMotionTime)
+\end{lstlisting}
+and use t as a parameter in a linear interpolation between the points.
+
+\begin{equation}
+lerp(p_1, p_2, t) = (1-t) \times p_1 + t \times p_2
+\end{equation}
+
+Try something similar for the position of the camera, LookAt point of camera,
+positions of lights (and colors and more). Go crazy!
+
+\subsection{Bezier curve exercise}
+Now you've got a class that moves an object along a path between two points. It
+does this by mapping the time between startTime and endTime to a parameter
+between 0 and 1. Now use this parameter in a function for a Bezier curve with 4
+control points. Try to have the control points within the viewing volume at first to
+see the object the whole time. Then experiment with the control points.
+\end{document}
